@@ -3,15 +3,13 @@ package com.gmail.tylercap4.jumpsumfree;
 import java.util.Collections;
 import java.util.LinkedList;
 
-import com.gmail.tylercap4.jumpsum.R;
-
 import android.widget.FrameLayout;
 
 public class JumpSumFree extends JumpSum
 {    
 	@Override
 	protected void setCorrectContentView(){
-        setContentView(R.layout.jump_sum_easy);		
+        setContentView(R.layout.jump_sum_free);		
 	}
 	
     @Override

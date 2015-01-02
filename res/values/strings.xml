@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Jump Sum</string>
+    <string name="app_name">Jump Sum Free</string>
+    <string name="banner_ad_id">ca-app-pub-8484316959485082/1776106053</string>
+    <string name="full_page_ad_id">ca-app-pub-8484316959485082/3252839257</string>
     <string name="facebook_app_id">506870486121740</string>
     <string name="games_app_id">320198239668</string>
     <string name="leaderboard_id">CgkItMu16qgJEAIQAQ</string>
-    <string name="achievement_60plus_id">CgkItMu16qgJEAIQBA </string>
+    <string name="achievement_60plus_id">CgkItMu16qgJEAIQBA</string>
     <string name="achievement_80plus_id">CgkItMu16qgJEAIQAw</string>
     <string name="achievement_90plus_id">CgkItMu16qgJEAIQAg</string>
     <string name="achievement_90plus5_id">CgkItMu16qgJEAIQCQ</string>
@@ -29,8 +31,9 @@
     <string name="current_score">Current Score: </string>
     <string name="high_score">High Score:\n</string>
     <string name="how_to">How\nTo</string>
-    <string name="new_game">New\nGame</string>
-    <string name="post_score">Post Score\nTo Facebook</string>
+    <string name="download_full">Download the full\nversion of Jump Sum</string>
+    <string name="new_game">New\ngame</string>
+    <string name="post_score">Post score\nto Facebook</string>
     <string name="objective_title">Objective:</string>
     <string name="game_play_title">Game Play:</string>
     <string name="scoring_title">Scoring:</string>

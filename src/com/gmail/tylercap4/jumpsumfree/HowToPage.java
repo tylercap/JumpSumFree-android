@@ -1,6 +1,5 @@
 package com.gmail.tylercap4.jumpsumfree;
 
-import com.gmail.tylercap4.jumpsum.R;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -5,8 +5,10 @@ import java.util.StringTokenizer;
 
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.FacebookDialog;
-import com.gmail.tylercap4.jumpsum.R;
 import com.gmail.tylercap4.jumpsumfree.basegameutils.BaseGameUtils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -24,6 +26,7 @@ import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -41,6 +44,9 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 	private static final String 	SIGNED_IN_KEY = "SIGNED_IN";
 	private static int RC_SIGN_IN = 9001;
 	private static int REQUEST_LEADERBOARD = 8099;
+	
+	private InterstitialAd interstitial;
+    private AdView mAdView;
 	
 	/* Client used to interact with Google APIs. */
 	private GoogleApiClient mGoogleApiClient;
@@ -73,6 +79,17 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
         
         uiHelper = new UiLifecycleHelper(this, null);
         uiHelper.onCreate(savedInstanceState);
+        
+        // Create the interstitial
+        interstitial = new InterstitialAd(JumpSum.this);
+        interstitial.setAdUnitId(getString(R.string.full_page_ad_id));
+
+        // Begin loading your interstitial
+        interstitial.loadAd(new AdRequest.Builder().build());
+
+        // Load the banner ad
+        mAdView = (AdView) findViewById(R.id.adView);
+        mAdView.loadAd(new AdRequest.Builder().build());
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -140,6 +157,10 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onStart(){
     	super.onStart();
     	
+    	reloadSignIn();
+    }
+    
+    private void reloadSignIn(){
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	boolean signed_in = prefs.getBoolean(SIGNED_IN_KEY, false);
     	if( signed_in ){
@@ -231,6 +252,9 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
                     requestCode, resultCode, R.string.sign_in_failed);
             }
         }
+        else if (requestCode == REQUEST_LEADERBOARD) {
+        	reloadSignIn();
+        }
         else{
 	        uiHelper.onActivityResult(requestCode, resultCode, data, new FacebookDialog.Callback() {
 	            @Override
@@ -256,6 +280,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     public void onDestroy() {
         super.onDestroy();
         uiHelper.onDestroy();
+        mAdView.pause();
     }
 
     
@@ -263,6 +288,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onPause(){
     	super.onPause();
         uiHelper.onPause();
+        mAdView.pause();
         
     	FragmentTransaction ft = getFragmentManager().beginTransaction();
         Fragment prev = getFragmentManager().findFragmentByTag("dialog");
@@ -295,6 +321,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onResume(){
     	super.onResume();
         uiHelper.onResume();
+        mAdView.pause();
         
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
         	findViewById(R.id.sign_in_button).setVisibility(View.GONE);
@@ -387,9 +414,20 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	}
     }
     
+    public void displayInterstitial() {
+        if (interstitial.isLoaded()) {
+        	interstitial.show();
+        }
+    }
+    
     private void newGame(){
+    	displayInterstitial();
+    	
     	doNewGame();
     	this.game_over = false;
+    	this.current_drag = false;
+    	
+        interstitial.loadAd(new AdRequest.Builder().build());
     }
     
     private void gameOver( boolean new_high, int score ){    	
@@ -415,18 +453,18 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     		Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_10000g_id), 1);
     		Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_10000p_id), score);
     		
-    		if( score > 60 ){
+    		if( score >= 60 ){
     			Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_60plus_id));
     		}
-    		if( score > 80 ){
+    		if( score >= 80 ){
     			Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_80plus_id));
     		}
-    		if( score > 90 ){
+    		if( score >= 90 ){
     			Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_90plus_id));
     			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_90plus5_id), 1);
     			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_90plus20_id), 1);
     		}
-    		if( score > 95 ){
+    		if( score >= 95 ){
     			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_95plus100_id), 1);
     		}
     		if( score == 100 ){
@@ -442,33 +480,31 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	// the jumped_tile will be the tile in between the start_tile and end_tile
     	// the value at the start_tile will be added to the value at the jumped_tile and the sum will be placed in the end_tile
     	// the start_tile and jumped_tile will become empty tiles
-    	synchronized( JumpSum.this ){
-	    	int start_row = start_tile.getRow();
-	    	int start_column = start_tile.getColumn();
-	    	int end_row = end_tile.getRow();
-	    	int end_column = end_tile.getColumn();
-	    	
-	    	int jump_row = (start_row + end_row) / 2;
-	    	int jump_column = (start_column + end_column) / 2;
-	    	IndexedButton jumped_tile = widgets[jump_row][jump_column];
-	    	
-	    	int start_val = gameboard[start_row][start_column];
-	    	int jump_val = gameboard[jump_row][jump_column];
-	    	
-	    	int end_val = start_val + jump_val;
-	    	gameboard[end_row][end_column] = end_val;
-	    	end_tile.setText(String.valueOf(end_val));
-	    	
-	    	gameboard[start_row][start_column] = -1;
-	    	gameboard[jump_row][jump_column] = -1;
-	    	start_tile.setText("");
-	    	jumped_tile.setText("");
-	    	
-	    	int score = getScore();
-	    	updateScore(score);
+    	int start_row = start_tile.getRow();
+    	int start_column = start_tile.getColumn();
+    	int end_row = end_tile.getRow();
+    	int end_column = end_tile.getColumn();
+    	
+    	int jump_row = (start_row + end_row) / 2;
+    	int jump_column = (start_column + end_column) / 2;
+    	IndexedButton jumped_tile = widgets[jump_row][jump_column];
+    	
+    	int start_val = gameboard[start_row][start_column];
+    	int jump_val = gameboard[jump_row][jump_column];
+    	
+    	int end_val = start_val + jump_val;
+    	gameboard[end_row][end_column] = end_val;
+    	end_tile.setText(String.valueOf(end_val));
+    	
+    	gameboard[start_row][start_column] = -1;
+    	gameboard[jump_row][jump_column] = -1;
+    	start_tile.setText("");
+    	jumped_tile.setText("");
+    	
+    	int score = getScore();
+    	updateScore(score);
 
-	    	new CheckGameOverTask().execute(score);
-    	}
+    	new CheckGameOverTask().execute(score);
     }
     
     private int getHighScore(){
@@ -536,6 +572,17 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 		    } 
         	if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
         		view.performClick();
+        		
+        		synchronized( JumpSum.this ){
+		        	view.setVisibility(View.VISIBLE);
+		        	
+		        	IndexedButton button = (IndexedButton)view;
+			        for( Button eligible:getEligibleDropTargets(button.getRow(), button.getColumn()) ){
+			        	eligible.setBackgroundResource(R.drawable.custom_button);
+			        }
+		        	JumpSum.this.current_drag = false;
+	        	}        		
+        		
         		return true;
         	}
         	else {
@@ -657,12 +704,17 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
             // Use the Builder class for convenient dialog construction
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage(getGameOverMessage())
-                   .setPositiveButton(/* "New Game"*/R.string.new_game, new DialogInterface.OnClickListener() {
+            	   .setNeutralButton(R.string.download_full, new DialogInterface.OnClickListener() {
+                       public void onClick(DialogInterface dialog, int id) {
+                           goToFullVersion();
+                       }
+                   })
+                   .setPositiveButton(R.string.new_game, new DialogInterface.OnClickListener() {
                        public void onClick(DialogInterface dialog, int id) {
                            newGame();
                        }
                    })
-                   .setNegativeButton(/*"Dismiss"*/R.string.post_score, new DialogInterface.OnClickListener() {
+                   .setNegativeButton(R.string.post_score, new DialogInterface.OnClickListener() {
                        public void onClick(DialogInterface dialog, int id) {
                            postScoreToFacebook();
                        }
@@ -684,6 +736,16 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
         	}
         }
         
+        private void goToFullVersion(){
+        	try {
+        	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.gmail.tylercap4.jumpsum")));
+        	} catch (android.content.ActivityNotFoundException anfe) {
+        	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.gmail.tylercap4.jumpsum")));
+        	}
+
+        }
+        
+        // TODO: change link in facebook post
         private void postScoreToFacebook(){    		
         	// post to Facebook
         	if (FacebookDialog.canPresentShareDialog(getApplicationContext(), 
