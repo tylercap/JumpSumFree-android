@@ -6,7 +6,7 @@ import android.app.Dialog;
 import android.content.IntentSender;
 import android.util.Log;
 
-import com.gmail.tylercap4.jumpsum.R;
+import com.gmail.tylercap4.jumpsumfree.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
