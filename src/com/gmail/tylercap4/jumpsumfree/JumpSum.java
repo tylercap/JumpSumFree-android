@@ -3,6 +3,7 @@ package com.gmail.tylercap4.jumpsumfree;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
+import com.facebook.AppEventsLogger;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.FacebookDialog;
 import com.gmail.tylercap4.jumpsumfree.basegameutils.BaseGameUtils;
@@ -289,6 +290,9 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	super.onPause();
         uiHelper.onPause();
         mAdView.pause();
+
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
         
     	FragmentTransaction ft = getFragmentManager().beginTransaction();
         Fragment prev = getFragmentManager().findFragmentByTag("dialog");
@@ -322,6 +326,9 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	super.onResume();
         uiHelper.onResume();
         mAdView.pause();
+
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
         
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
         	findViewById(R.id.sign_in_button).setVisibility(View.GONE);
@@ -745,7 +752,6 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 
         }
         
-        // TODO: change link in facebook post
         private void postScoreToFacebook(){    		
         	// post to Facebook
         	if (FacebookDialog.canPresentShareDialog(getApplicationContext(), 
@@ -754,7 +760,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
         		String message = "I Scored " + score + " in Jump Sum";
         		
 			    FacebookDialog.ShareDialogBuilder builder = new FacebookDialog.ShareDialogBuilder(JumpSum.this)
-			            .setLink("http://play.google.com/store/apps/details?id=com.gmail.tylercap4.jumpsum")
+			            .setLink("http://play.google.com/store/apps/details?id=com.gmail.tylercap4.jumpsumfree")
 			            .setCaption(message)			            
 			            .setDescription(message);
 
@@ -767,7 +773,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 //        		Bundle params = new Bundle();
 //        	    params.putString("caption", message);
 //        	    params.putString("description", message);
-//        	    params.putString("link", "http://play.google.com/store/apps/details?id=com.gmail.tylercap4.jumpsum");
+//        	    params.putString("link", "http://play.google.com/store/apps/details?id=com.gmail.tylercap4.jumpsumfree");
 //
 //        	    WebDialog feedDialog = (
 //        	            new WebDialog.FeedDialogBuilder(getActivity(),
