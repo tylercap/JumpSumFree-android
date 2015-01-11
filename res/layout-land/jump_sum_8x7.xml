@@ -211,13 +211,15 @@
 		        android:id="@+id/howToButton"
 			    android:text="@string/how_to"
     			android:layout_gravity="left"
-		    	style="@style/HowToButton" />
+		    	style="@style/HowToButton"  
+        		android:layout_weight="1" />
 	        
 	        <Button
 		        android:id="@+id/newGameButton"
 		        android:text="@string/new_game"
     			android:layout_gravity="right"
-	    		style="@style/NewGameButton" />
+	    		style="@style/NewGameButton"  
+        		android:layout_weight="1" />
 	        
 	    </LinearLayout>
 

@@ -5,10 +5,10 @@
         android:radius="10dp"/>
     <!-- Padding, in this case, around the button's text  -->
     <padding
-        android:left="3dp"
-        android:right="3dp"
-        android:top="3dp"
-        android:bottom="3dp"
+        android:left="8dp"
+        android:right="8dp"
+        android:top="8dp"
+        android:bottom="8dp"
         />
     <solid
         android:color="@color/new_game_back"/>
