@@ -31,6 +31,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.*;
 import android.view.View.*;
@@ -40,17 +41,15 @@ import android.widget.*;
 public abstract class JumpSum extends Activity implements ConnectionCallbacks, OnConnectionFailedListener 
 {	
 	protected static final String 	TAG = "JumpSum";
-	private static final String 	HIGH_SCORE_KEY = "HIGH_SCORE";
-	private static final String 	GAME_VALUES_KEY = "GAME_VALUES";
 	private static final String 	SIGNED_IN_KEY = "SIGNED_IN";
 	private static int RC_SIGN_IN = 9001;
-	private static int REQUEST_LEADERBOARD = 8099;
+	protected static int REQUEST_LEADERBOARD = 8099;
 	
 	private InterstitialAd interstitial;
     private AdView mAdView;
 	
 	/* Client used to interact with Google APIs. */
-	private GoogleApiClient mGoogleApiClient;
+	protected GoogleApiClient mGoogleApiClient;
 
 	private boolean mResolvingConnectionFailure = false;
 	private boolean mSignInClicked = false;
@@ -65,18 +64,21 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 	
 	private UiLifecycleHelper uiHelper;
     
+	protected abstract int							getRows();
+	protected abstract int							getColumns();
+    protected abstract String 						getGameValsKey();
+    protected abstract String 						getHighScoreKey();
 	protected abstract void							setCorrectContentView();
-    protected abstract void 						initBoardAndWidgets();
+	protected abstract void							initWidgetIds();
     protected abstract void 						doNewGame();
-    protected abstract String 						getGameAsString();
-    protected abstract int 							getScore();
-    protected abstract boolean 						checkGameOver();
-    protected abstract LinkedList<IndexedButton> 	getEligibleDropTargets( int row, int column );
+    protected abstract void							updateAdditionalAchievements( int score );
+    protected abstract void							showLeaderboard();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setCorrectContentView();
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         
         uiHelper = new UiLifecycleHelper(this, null);
         uiHelper.onCreate(savedInstanceState);
@@ -170,21 +172,14 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     }
     
     @Override
-    protected void onStop(){
-    	super.onStop();
-    	
-    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	SharedPreferences.Editor prefs_editor = prefs.edit();
-    	
-    	if (mGoogleApiClient.isConnected()) {
-    		mGoogleApiClient.disconnect();
-        	prefs_editor.putBoolean(SIGNED_IN_KEY, true);
-    	}
-    	else{
-    		prefs_editor.putBoolean(SIGNED_IN_KEY, false);
-    	}
-    	
-    	prefs_editor.commit();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        // Respond to the action bar's Up/Home button
+        case android.R.id.home:
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
     
     @Override
@@ -303,22 +298,29 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	
     	super.onPause();
     	
+    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	SharedPreferences.Editor prefs_editor = prefs.edit();
+    	
+    	if (mGoogleApiClient.isConnected()) {
+    		mGoogleApiClient.disconnect();
+        	prefs_editor.putBoolean(SIGNED_IN_KEY, true);
+    	}
+    	else{
+    		prefs_editor.putBoolean(SIGNED_IN_KEY, false);
+    	}
+    	prefs_editor.commit();
+    	
     	if( game_over ){
     		// Erase any saved games.  If we finish on a saved game, a new game should be loaded on launch.
-    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        	SharedPreferences.Editor prefs_editor = prefs.edit();
-        	prefs_editor.remove(GAME_VALUES_KEY);
-        	prefs_editor.commit();
+        	prefs_editor.remove(getGameValsKey());
     	}
     	else{
     		// save the game currently in progress.
     		String game_as_string = getGameAsString();
     		
-    		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        	SharedPreferences.Editor prefs_editor = prefs.edit();
-        	prefs_editor.putString(GAME_VALUES_KEY, game_as_string);
-        	prefs_editor.commit();
-    	}
+        	prefs_editor.putString(getGameValsKey(), game_as_string);
+    	}    	
+    	prefs_editor.commit();
     }
     
     @Override
@@ -355,7 +357,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 	        
 	        // check for game currently in progress
 	        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-	    	String game_string = prefs.getString(GAME_VALUES_KEY, null);
+	    	String game_string = prefs.getString(getGameValsKey(), null);
 	        
 	        if( game_string != null ){
 	        	// load the values into our board
@@ -375,11 +377,94 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	updateHighScore(score);
     	this.current_drag = false;
     }
+	
+    protected void initBoardAndWidgets(){
+    	int rows = getRows();
+    	int columns = getColumns();
+    	
+    	widget_ids = new int[rows][columns];
+    	initWidgetIds();
+        gameboard = new int[rows][columns];
+        widgets = new IndexedButton[rows][columns];
+    }
     
-    private void showLeaderboard(){
-    	// show the google play leaderboard
-    	startActivityForResult(Games.Leaderboards.getLeaderboardIntent(mGoogleApiClient,
-    	        			   getString(R.string.leaderboard_id)), REQUEST_LEADERBOARD);
+    protected String getGameAsString(){
+    	int rows = getRows();
+    	int columns = getColumns();
+    	
+    	// save the game currently in progress
+    	StringBuilder game_string = new StringBuilder();
+    	for(int row = 0; row < rows; row++ ){    		
+    		for( int column = 0; column < columns; column++ ){
+    			int value = gameboard[row][column];
+    			
+    			game_string.append(value);
+    			if( column < (columns - 1) ){
+    				game_string.append(',');
+    			}
+    		}
+    		if( row < (rows - 1) ){
+				game_string.append(';');
+			}
+    	}
+    	
+    	return game_string.toString();
+    }
+    
+    protected boolean checkGameOver(){    	
+    	int rows = getRows();
+    	int columns = getColumns();
+    	
+    	for(int row = 0; row < rows; row++ ){    		
+    		for( int column = 0; column < columns; column++ ){
+    			if( getEligibleDropTargets(row, column).size() > 0 ){
+    				return false;
+    			}
+    		}
+    	}
+    	
+    	return true;
+    }
+    
+    protected LinkedList<IndexedButton> getEligibleDropTargets( int row, int column ){
+    	LinkedList<IndexedButton> eligible = new LinkedList<IndexedButton>();
+    	
+    	synchronized( JumpSum.this ){
+    		if( gameboard[row][column] <= 0 ){
+	    		// can't move a blank piece
+	    		return eligible;
+	    	}
+	    	
+	    	// must check that there is a value in between the two as well
+	    	if( row + 2 < getRows() && (gameboard[row + 2][column] == -1) && (gameboard[row + 1][column] > 0) ){
+	    		eligible.add( widgets[row + 2][column] );
+	    	}
+	    	if( row - 2 >= 0 && (gameboard[row - 2][column] == -1) && (gameboard[row - 1][column] > 0) ){
+	    		eligible.add( widgets[row - 2][column] );
+	    	}
+	    	if( column + 2 < getColumns() && (gameboard[row][column + 2] == -1) && (gameboard[row][column + 1] > 0) ){
+	    		eligible.add( widgets[row][column + 2] );
+	    	}
+	    	if( column - 2 >= 0 && (gameboard[row][column - 2] == -1) && (gameboard[row][column - 1] > 0) ){
+	    		eligible.add( widgets[row][column - 2] );
+	    	}
+    	}
+    	
+    	return eligible;
+    }
+
+    protected int getScore(){
+    	int rows = getRows();
+    	int columns = getColumns();
+    	int score = 0;
+    	
+    	for(int row = 0; row < rows; row++ ){    		
+    		for( int column = 0; column < columns; column++ ){
+    			score = Math.max(gameboard[row][column], score);
+    		}
+    	}
+    	
+    	return score;
     }
 
     private void showHowTo(){
@@ -404,14 +489,16 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 	    			
 	    			gameboard[row][column] = value;
 	    			
-	    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
-	    			IndexedButton button = new IndexedButton(this, row, column);
-	    			setUpButton(button, value);
-	            	
-	    			if( view.getChildCount() > 0 )
-	    				view.removeAllViews();
-	            	view.addView(button);
-	            	widgets[row][column] = button;
+	    			if( value > -2 ){
+		    			FrameLayout view = (FrameLayout)findViewById(widget_ids[row][column]);
+		    			IndexedButton button = new IndexedButton(this, row, column);
+		    			setUpButton(button, value);
+		            	
+		    			if( view.getChildCount() > 0 )
+		    				view.removeAllViews();
+		            	view.addView(button);
+		            	widgets[row][column] = button;
+		    		}
 	    			
 	    			column++;
 	    		}
@@ -434,6 +521,9 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	this.game_over = false;
     	this.current_drag = false;
     	
+    	int score = getScore();
+    	updateScore(score);
+    	
         interstitial.loadAd(new AdRequest.Builder().build());
     }
     
@@ -452,33 +542,13 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	dialog.show(ft, "dialog");
     }
     
-    private void updateAchievements( int score ){
+    protected void updateAchievements( int score ){
     	// update achievements and leader board
     	if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-    		Games.Leaderboards.submitScore(mGoogleApiClient, getString(R.string.leaderboard_id), score);
+    		updateAdditionalAchievements( score );
     		
     		Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_10000g_id), 1);
     		Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_10000p_id), score);
-    		
-    		if( score >= 60 ){
-    			Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_60plus_id));
-    		}
-    		if( score >= 80 ){
-    			Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_80plus_id));
-    		}
-    		if( score >= 90 ){
-    			Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_90plus_id));
-    			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_90plus5_id), 1);
-    			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_90plus20_id), 1);
-    		}
-    		if( score >= 95 ){
-    			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_95plus100_id), 1);
-    		}
-    		if( score == 100 ){
-    			Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_perfect_id));
-    			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_perfect5_id), 1);
-    			Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_perfect20_id), 1);
-    		}
     	}
     }
     
@@ -517,7 +587,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     private int getHighScore(){
     	// get the high score from the memory if it exists
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	return prefs.getInt(HIGH_SCORE_KEY, 0);
+    	return prefs.getInt(getHighScoreKey(), 0);
     }
     
     private boolean updateHighScore(int score){
@@ -530,7 +600,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 	    	// write the new high score to memory
 	    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    	SharedPreferences.Editor prefs_editor = prefs.edit();
-	    	prefs_editor.putInt(HIGH_SCORE_KEY, score);
+	    	prefs_editor.putInt(getHighScoreKey(), score);
 	    	prefs_editor.commit();
 	    	
 	    	return true;
@@ -571,7 +641,8 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 				        
 				        IndexedButton button = (IndexedButton)view;
 				        for( Button eligible:getEligibleDropTargets(button.getRow(), button.getColumn()) ){
-				        	eligible.setBackgroundResource(R.drawable.eligible_drop);
+				        	if( eligible != null )
+				        		eligible.setBackgroundResource(R.drawable.eligible_drop);
 				        }	
         			}
         		}
@@ -585,7 +656,8 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 		        	
 		        	IndexedButton button = (IndexedButton)view;
 			        for( Button eligible:getEligibleDropTargets(button.getRow(), button.getColumn()) ){
-			        	eligible.setBackgroundResource(R.drawable.custom_button);
+			        	if( eligible != null )
+			        		eligible.setBackgroundResource(R.drawable.custom_button);
 			        }
 		        	JumpSum.this.current_drag = false;
 	        	}        		
@@ -623,11 +695,13 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 			        	dragged_view.setVisibility(View.VISIBLE);
 			        	
 			        	for( IndexedButton eligible:getEligibleDropTargets(row, column) ){
-			        		eligible.setBackgroundResource(R.drawable.custom_button);
-				        	
-				        	if( eligible.equals(dropped_view) ){
-				        		jumpedTile(dragged_button, eligible);
-				        	}
+			        		if( eligible != null ){
+				        		eligible.setBackgroundResource(R.drawable.custom_button);
+					        	
+					        	if( eligible.equals(dropped_view) ){
+					        		jumpedTile(dragged_button, eligible);
+					        	}
+			        		}
 				        }
 			        	JumpSum.this.current_drag = false;
 		            }
@@ -637,7 +711,8 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 			        	dragged_view.setVisibility(View.VISIBLE);
 			        	
 			        	for( Button eligible:getEligibleDropTargets(row, column) ){
-				        	eligible.setBackgroundResource(R.drawable.custom_button);
+			        		if( eligible != null )
+			        			eligible.setBackgroundResource(R.drawable.custom_button);
 				        }
 			        	JumpSum.this.current_drag = false;
 		        	}

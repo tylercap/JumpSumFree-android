@@ -2,13 +2,13 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android" 
        android:shape="rectangle" >
     <corners
-        android:radius="15dp"/>
+        android:radius="10dp"/>
     <!-- Padding, in this case, around the button's text  -->
     <padding
-        android:left="20dp"
-        android:right="20dp"
-        android:top="10dp"
-        android:bottom="10dp"
+        android:left="3dp"
+        android:right="3dp"
+        android:top="3dp"
+        android:bottom="3dp"
         />
     <solid
         android:color="@color/how_to_back"/>
