@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Jump Sum Free</string>    
+    <string name="level1">Jump Sum Level 1</string>
+    <string name="level2">Jump Sum Level 2</string>
+    <string name="level3">Jump Sum Level 3</string>
+    <string name="level4">Jump Sum Level 4</string>
+    <string name="level5">Jump Sum Level 5</string>
+    <string name="level6">Jump Sum Level 6</string>
+    <string name="level7">Jump Sum Level 7</string>
+    <string name="level8">Jump Sum Level 8</string>
+    <string name="level9">Jump Sum Level 9</string>
+    <string name="level10">Jump Sum Level 10</string>
 
-    <string name="app_name">Jump Sum Free</string>
     <string name="banner_ad_id">ca-app-pub-8484316959485082/1776106053</string>
     <string name="full_page_ad_id">ca-app-pub-8484316959485082/3252839257</string>
     <string name="facebook_app_id">768647469893426</string>
     <string name="games_app_id">320198239668</string>
     <string name="leaderboard_id">CgkItMu16qgJEAIQAQ</string>
-    <string name="achievement_60plus_id">CgkItMu16qgJEAIQBA</string>
-    <string name="achievement_80plus_id">CgkItMu16qgJEAIQAw</string>
-    <string name="achievement_90plus_id">CgkItMu16qgJEAIQAg</string>
-    <string name="achievement_90plus5_id">CgkItMu16qgJEAIQCQ</string>
-    <string name="achievement_90plus20_id">CgkItMu16qgJEAIQBQ</string>
-    <string name="achievement_perfect_id">CgkItMu16qgJEAIQBg</string>
-    <string name="achievement_perfect5_id">CgkItMu16qgJEAIQBw</string>
-    <string name="achievement_95plus100_id">CgkItMu16qgJEAIQCA</string>
-    <string name="achievement_perfect20_id">CgkItMu16qgJEAIQCw</string>
-    <string name="achievement_10000g_id">CgkItMu16qgJEAIQCg</string>
-    <string name="achievement_10000p_id">CgkItMu16qgJEAIQDQ</string>
+    <string name="leaderboard_l2_id">CgkItMu16qgJEAIQDg</string>
+    <string name="leaderboard_l3_id">CgkItMu16qgJEAIQFQ</string>
+    <string name="leaderboard_l4_id">CgkItMu16qgJEAIQFg</string>
+    <string name="leaderboard_l5_id">CgkItMu16qgJEAIQFw</string>
+    <string name="leaderboard_l6_id">CgkItMu16qgJEAIQGA</string>
+    <string name="leaderboard_l7_id">CgkItMu16qgJEAIQGQ</string>
+    <string name="leaderboard_l8_id">CgkItMu16qgJEAIQLg</string>
+    <string name="leaderboard_l9_id">CgkItMu16qgJEAIQLw</string>
+    <string name="leaderboard_l10_id">CgkItMu16qgJEAIQMA</string>
     
     <string name="sign_in_failed">Failed to sign in. Please check your network connection and try again.</string>
     <string name="app_misconfigured">The application is incorrectly configured. Check that the package name and signing certificate match the client ID created in Developer Console. Also, if the application is not yet published, check that the account you are trying to sign in with is listed as a tester account. See logs for more information.</string>
@@ -26,6 +34,17 @@
     
     <string name="sign_in">Sign In</string>
     <string name="sign_out">Sign Out</string>
+    <string name="chooseLevel">Choose a Level</string>
+    <string name="level1_button">Level 1</string>
+    <string name="level2_button">Level 2</string>
+    <string name="level3_button">Level 3</string>
+    <string name="level4_button">Level 4</string>
+    <string name="level5_button">Level 5</string>
+    <string name="level6_button">Level 6</string>
+    <string name="level7_button">Level 7</string>
+    <string name="level8_button">Level 8</string>
+    <string name="level9_button">Level 9</string>
+    <string name="level10_button">Level 10</string>
     <string name="leaderboard">Leaderboard</string>
     <string name="how_to_page">How To</string>
     <string name="current_score">Current Score: </string>
@@ -48,5 +67,62 @@
     <string name="example3_desc">Then the 20 can be moved over the 5 in the first row as well.</string>
     <string name="example4_desc">Then the 25 can be moved over the 4 in the second column.</string>
     <string name="example_finished_desc">There are still remaining moves that can be made, but the current score for this example would be 29.\n</string>
-
+    
+    <string name="achievement_90plus5_id">CgkItMu16qgJEAIQCQ</string>
+    <string name="achievement_90plus20_id">CgkItMu16qgJEAIQBQ</string>
+    <string name="achievement_perfect5_id">CgkItMu16qgJEAIQBw</string>
+    <string name="achievement_95plus100_id">CgkItMu16qgJEAIQCA</string>
+    <string name="achievement_perfect20_id">CgkItMu16qgJEAIQCw</string>
+    <string name="achievement_10000g_id">CgkItMu16qgJEAIQCg</string>
+    <string name="achievement_10000p_id">CgkItMu16qgJEAIQDQ</string>
+    
+    <string name="achievement_60plus_id">CgkItMu16qgJEAIQBA</string>
+    <string name="achievement_80plus_id">CgkItMu16qgJEAIQAw</string>
+    <string name="achievement_90plus_id">CgkItMu16qgJEAIQAg</string>
+    <string name="achievement_perfect_id">CgkItMu16qgJEAIQBg</string>
+    
+    <string name="achievement_60plus_l2_id">CgkItMu16qgJEAIQDw</string>
+    <string name="achievement_80plus_l2_id">CgkItMu16qgJEAIQEA</string>
+    <string name="achievement_90plus_l2_id">CgkItMu16qgJEAIQEQ</string>
+    <string name="achievement_perfect_l2_id">CgkItMu16qgJEAIQEg</string>
+    
+    <string name="achievement_60plus_l3_id">CgkItMu16qgJEAIQGg</string>
+    <string name="achievement_80plus_l3_id">CgkItMu16qgJEAIQGw</string>
+    <string name="achievement_90plus_l3_id">CgkItMu16qgJEAIQHA</string>
+    <string name="achievement_perfect_l3_id">CgkItMu16qgJEAIQKQ</string>
+    
+    <string name="achievement_60plus_l4_id">CgkItMu16qgJEAIQHQ</string>
+    <string name="achievement_80plus_l4_id">CgkItMu16qgJEAIQHg</string>
+    <string name="achievement_90plus_l4_id">CgkItMu16qgJEAIQHw</string>
+    <string name="achievement_perfect_l4_id">CgkItMu16qgJEAIQKg</string>
+    
+    <string name="achievement_60plus_l5_id">CgkItMu16qgJEAIQIA</string>
+    <string name="achievement_80plus_l5_id">CgkItMu16qgJEAIQIQ</string>
+    <string name="achievement_90plus_l5_id">CgkItMu16qgJEAIQIg</string>
+    <string name="achievement_perfect_l5_id">CgkItMu16qgJEAIQKw</string>
+    
+    <string name="achievement_60plus_l6_id">CgkItMu16qgJEAIQIw</string>
+    <string name="achievement_80plus_l6_id">CgkItMu16qgJEAIQJA</string>
+    <string name="achievement_90plus_l6_id">CgkItMu16qgJEAIQJQ</string>
+    <string name="achievement_perfect_l6_id">CgkItMu16qgJEAIQLA</string>
+    
+    <string name="achievement_60plus_l7_id">CgkItMu16qgJEAIQJg</string>
+    <string name="achievement_80plus_l7_id">CgkItMu16qgJEAIQJw</string>
+    <string name="achievement_90plus_l7_id">CgkItMu16qgJEAIQKA</string>
+    <string name="achievement_perfect_l7_id">CgkItMu16qgJEAIQLQ</string>
+    
+    <string name="achievement_60plus_l8_id">CgkItMu16qgJEAIQMQ</string>
+    <string name="achievement_80plus_l8_id">CgkItMu16qgJEAIQMg</string>
+    <string name="achievement_90plus_l8_id">CgkItMu16qgJEAIQMw</string>
+    <string name="achievement_perfect_l8_id">CgkItMu16qgJEAIQOg</string>
+    
+    <string name="achievement_60plus_l9_id">CgkItMu16qgJEAIQNA</string>
+    <string name="achievement_80plus_l9_id">CgkItMu16qgJEAIQNQ</string>
+    <string name="achievement_90plus_l9_id">CgkItMu16qgJEAIQNg</string>
+    <string name="achievement_perfect_l9_id">CgkItMu16qgJEAIQOw</string>
+    
+    <string name="achievement_60plus_l10_id">CgkItMu16qgJEAIQNw</string>
+    <string name="achievement_80plus_l10_id">CgkItMu16qgJEAIQOA</string>
+    <string name="achievement_90plus_l10_id">CgkItMu16qgJEAIQOQ</string>
+    <string name="achievement_perfect_l10_id">CgkItMu16qgJEAIQPA</string>
 </resources>
