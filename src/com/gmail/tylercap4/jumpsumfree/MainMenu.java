@@ -1,6 +1,8 @@
 package com.gmail.tylercap4.jumpsumfree;
 
 import com.gmail.tylercap4.jumpsumfree.basegameutils.BaseGameUtils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -21,6 +23,8 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
 {
 	private static final String SIGNED_IN_KEY = "SIGNED_IN";
 	private static int RC_SIGN_IN = 9001;
+
+    private AdView mAdView;
 	
 	/* Client used to interact with Google APIs. */
 	protected GoogleApiClient mGoogleApiClient;
@@ -32,6 +36,10 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);
+
+        // Load the banner ad
+        mAdView = (AdView) findViewById(R.id.adView);
+        mAdView.loadAd(new AdRequest.Builder().build());
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -152,6 +160,12 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
         });
 	}
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAdView.pause();
+    }
+
     private void showHowTo(){
     	// show a new page explaining how to play the game
     	Intent how_to = new Intent( this, HowToPage.class );
@@ -172,6 +186,7 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     protected void onPause(){
     	super.onPause();
+        mAdView.pause();
     	
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	SharedPreferences.Editor prefs_editor = prefs.edit();
@@ -257,6 +272,7 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     protected void onResume(){
     	super.onResume();
+        mAdView.resume();
         
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
         	findViewById(R.id.sign_in_button).setVisibility(View.GONE);

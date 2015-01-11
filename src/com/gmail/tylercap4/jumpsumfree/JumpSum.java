@@ -327,7 +327,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onResume(){
     	super.onResume();
         uiHelper.onResume();
-        mAdView.pause();
+        mAdView.resume();
 
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);

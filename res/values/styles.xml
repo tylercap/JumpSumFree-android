@@ -28,7 +28,7 @@
     <style name="HowToButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_gravity">left</item>
         <item name="android:background">@drawable/how_to_button</item>
         <item name="android:textColor">@color/how_to_border</item>
     </style>
@@ -36,7 +36,7 @@
     <style name="NewGameButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_gravity">right</item>
         <item name="android:background">@drawable/new_game_button</item>
         <item name="android:textColor">@color/new_game_border</item>
     </style>
