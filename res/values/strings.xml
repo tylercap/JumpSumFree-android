@@ -12,8 +12,10 @@
     <string name="level9">Jump Sum Level 9</string>
     <string name="level10">Jump Sum Level 10</string>
 
-    <string name="banner_ad_id">ca-app-pub-8484316959485082/1776106053</string>
-    <string name="full_page_ad_id">ca-app-pub-8484316959485082/3252839257</string>
+    <string name="mob_fox_publisher_id">cade5559d9326357f8e324e4e9acc1f4</string>
+    <string name="banner_ad_mob_id">ca-app-pub-8484316959485082/1776106053</string>
+    <string name="full_page_ad_mob_id">ca-app-pub-8484316959485082/3252839257</string>
+    
     <string name="facebook_app_id">768647469893426</string>
     <string name="games_app_id">320198239668</string>
     <string name="leaderboard_id">CgkItMu16qgJEAIQAQ</string>
