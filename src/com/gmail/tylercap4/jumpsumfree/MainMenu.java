@@ -1,6 +1,8 @@
 package com.gmail.tylercap4.jumpsumfree;
 
 import com.gmail.tylercap4.jumpsumfree.basegameutils.BaseGameUtils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -15,7 +17,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class MainMenu extends Activity implements ConnectionCallbacks, OnConnectionFailedListener
@@ -23,8 +24,7 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
 	private static final String SIGNED_IN_KEY = "SIGNED_IN";
 	private static int RC_SIGN_IN = 9001;
 
-	//private com.google.android.gms.ads.AdView adMobView;
-	private com.adsdk.sdk.banner.AdView mobFoxAdView;
+	private AdView adMobView;
 	
 	/* Client used to interact with Google APIs. */
 	protected GoogleApiClient mGoogleApiClient;
@@ -38,17 +38,8 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
         setContentView(R.layout.main_menu);
 
         // Load the banner ad
-        //adMobView = (AdView) findViewById(R.id.adView);
-        //adMobView.loadAd(new AdRequest.Builder().build());
-        
-        // Load the banner ad
-        FrameLayout layout = (FrameLayout) findViewById(R.id.banner_layout);
-        mobFoxAdView = new com.adsdk.sdk.banner.AdView(this, "http://my.mobfox.com/request.php", getString(R.string.mob_fox_publisher_id), true, true);
-        mobFoxAdView.setAdspaceWidth(320); // Optional, used to set the custom size of banner placement. Without setting it, the SDK will use default size of 320x50 or 300x50 depending on device type.
-        mobFoxAdView.setAdspaceHeight(50);  
-        mobFoxAdView.setAdspaceStrict(false); // Optional, tells the server to only supply banner ads that are exactly of the desired size. Without setting it, the server could also supply smaller Ads when no ad of desired size is available.
-        // mobFoxAdView.setAdListener(this);
-        layout.addView(mobFoxAdView);
+        adMobView = (AdView) findViewById(R.id.adView);
+        adMobView.loadAd(new AdRequest.Builder().build());
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -172,8 +163,7 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //adMobView.pause();
-    	mobFoxAdView.pause();
+        adMobView.pause();
     }
 
     private void showHowTo(){
@@ -196,8 +186,7 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     protected void onPause(){
     	super.onPause();
-    	//adMobView.pause();
-    	mobFoxAdView.pause();
+    	adMobView.pause();
     	
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	SharedPreferences.Editor prefs_editor = prefs.edit();
@@ -283,8 +272,7 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     protected void onResume(){
     	super.onResume();
-    	//adMobView.resume();
-    	mobFoxAdView.resume();
+    	adMobView.resume();
         
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
         	findViewById(R.id.sign_in_button).setVisibility(View.GONE);

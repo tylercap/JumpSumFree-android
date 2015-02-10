@@ -3,11 +3,12 @@ package com.gmail.tylercap4.jumpsumfree;
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
-import com.adsdk.sdk.AdManager;
 import com.facebook.AppEventsLogger;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.FacebookDialog;
 import com.gmail.tylercap4.jumpsumfree.basegameutils.BaseGameUtils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -45,9 +46,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 	protected static int REQUEST_LEADERBOARD = 8099;
 	
 	private InterstitialAd adMobInterstitial;
-    //private com.google.android.gms.ads.AdView adMobView;
-	private com.adsdk.sdk.banner.AdView mobFoxAdView;
-	private AdManager mobFoxManager;
+    private AdView adMobView;
 	
 	/* Client used to interact with Google APIs. */
 	protected GoogleApiClient mGoogleApiClient;
@@ -86,32 +85,14 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
         
         // Create the interstitial
         adMobInterstitial = new InterstitialAd(JumpSum.this);
-        adMobInterstitial.setAdUnitId(getString(R.string.full_page_ad_mob_id));
+        adMobInterstitial.setAdUnitId(getString(R.string.full_page_ad_id));
 
         // Begin loading your interstitial
         adMobInterstitial.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
 
         // Load the banner ad
-        //adMobView = (AdView) findViewById(R.id.adView);
-        //adMobView.loadAd(new AdRequest.Builder().build());
-        
-        // Load the banner ad
-        FrameLayout layout = (FrameLayout) findViewById(R.id.banner_layout);
-        mobFoxAdView = new com.adsdk.sdk.banner.AdView(this, "http://my.mobfox.com/request.php", getString(R.string.mob_fox_publisher_id), true, true);
-        mobFoxAdView.setAdspaceWidth(320); // Optional, used to set the custom size of banner placement. Without setting it, the SDK will use default size of 320x50 or 300x50 depending on device type.
-        mobFoxAdView.setAdspaceHeight(50);  
-        mobFoxAdView.setAdspaceStrict(false); // Optional, tells the server to only supply banner ads that are exactly of the desired size. Without setting it, the server could also supply smaller Ads when no ad of desired size is available.
-        // mobFoxAdView.setAdListener(this);
-        layout.addView(mobFoxAdView);
-        
-        // Begin loading your interstitial
-        mobFoxManager = new AdManager(this, "http://my.mobfox.com/request.php", getString(R.string.mob_fox_publisher_id), true);
-        // mobFoxManager.setListener(this);
-        mobFoxManager.requestAd();
-        
-        mobFoxManager.setInterstitialAdsEnabled(true); //enabled by default. Allows the SDK to request static interstitial ads.
-        mobFoxManager.setVideoAdsEnabled(true); //disabled by default. Allows the SDK to request video fullscreen ads.
-        //mobFoxManager.setPrioritizeVideoAds(true); //disabled by default. If enabled, indicates that SDK should request video ads first, and only if there is no video request an interstitial (if enabled)
+        adMobView = (AdView) findViewById(R.id.adView);
+        adMobView.loadAd(new AdRequest.Builder().build());
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -295,8 +276,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     public void onDestroy() {
         super.onDestroy();
         uiHelper.onDestroy();
-        //adMobView.pause();
-        mobFoxAdView.pause();
+        adMobView.pause();
     }
 
     
@@ -304,8 +284,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onPause(){
     	super.onPause();
         uiHelper.onPause();
-        //adMobView.pause();
-        mobFoxAdView.pause();
+        adMobView.pause();
 
         // Logs 'app deactivate' App Event.
         AppEventsLogger.deactivateApp(this);
@@ -348,8 +327,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onResume(){
     	super.onResume();
         uiHelper.onResume();
-        //adMobView.resume();
-        mobFoxAdView.resume();
+        adMobView.resume();
 
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
@@ -531,10 +509,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     }
     
     public void displayInterstitial() {
-    	if (mobFoxManager.isAdLoaded()) {
-        	mobFoxManager.showAd();
-        }
-    	else if (adMobInterstitial.isLoaded()) {
+    	if (adMobInterstitial.isLoaded()) {
         	adMobInterstitial.show();
         }
     }
@@ -550,7 +525,6 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	updateScore(score);
     	
     	adMobInterstitial.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
-    	mobFoxManager.requestAd();
     }
     
     private void gameOver( boolean new_high, int score ){    	
