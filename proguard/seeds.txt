@@ -6653,6 +6653,7 @@ com.gmail.tylercap4.jumpsumfree.R$color: int how_to_border
 com.gmail.tylercap4.jumpsumfree.R$color: int how_to_text
 com.gmail.tylercap4.jumpsumfree.R$color: int new_game_back
 com.gmail.tylercap4.jumpsumfree.R$color: int new_game_border
+com.gmail.tylercap4.jumpsumfree.R$color: int score_text
 com.gmail.tylercap4.jumpsumfree.R$color: int sign_out_back
 com.gmail.tylercap4.jumpsumfree.R$color: int sign_out_border
 com.gmail.tylercap4.jumpsumfree.R$color: int wallet_bright_foreground_disabled_holo_light
