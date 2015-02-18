@@ -8596,7 +8596,7 @@ com.facebook.widget.WebDialog$RequestsDialogBuilder -> com.facebook.widget.WebDi
     com.facebook.widget.WebDialog$BuilderBase setTheme(int) -> setTheme
     com.facebook.widget.WebDialog$BuilderBase setOnCompleteListener(com.facebook.widget.WebDialog$OnCompleteListener) -> setOnCompleteListener
 com.gmail.tylercap4.jumpsumfree.HowToPage -> com.gmail.tylercap4.jumpsumfree.HowToPage:
-    com.google.android.gms.ads.AdView mAdView -> a
+    com.google.android.gms.ads.AdView adMobView -> a
     void onCreate(android.os.Bundle) -> onCreate
     void onResume() -> onResume
     void onDestroy() -> onDestroy
@@ -8611,8 +8611,8 @@ com.gmail.tylercap4.jumpsumfree.IndexedButton -> com.gmail.tylercap4.jumpsumfree
 com.gmail.tylercap4.jumpsumfree.JumpSum -> com.gmail.tylercap4.jumpsumfree.b:
     int RC_SIGN_IN -> f
     int REQUEST_LEADERBOARD -> a
-    com.google.android.gms.ads.InterstitialAd interstitial -> g
-    com.google.android.gms.ads.AdView mAdView -> h
+    com.google.android.gms.ads.InterstitialAd adMobInterstitial -> g
+    com.google.android.gms.ads.AdView adMobView -> h
     com.google.android.gms.common.api.GoogleApiClient mGoogleApiClient -> b
     boolean mResolvingConnectionFailure -> i
     boolean mSignInClicked -> j
@@ -8814,7 +8814,7 @@ com.gmail.tylercap4.jumpsumfree.JumpSumLevel9 -> com.gmail.tylercap4.jumpsumfree
     void doNewGame() -> g
 com.gmail.tylercap4.jumpsumfree.MainMenu -> com.gmail.tylercap4.jumpsumfree.MainMenu:
     int RC_SIGN_IN -> b
-    com.google.android.gms.ads.AdView mAdView -> c
+    com.google.android.gms.ads.AdView adMobView -> c
     com.google.android.gms.common.api.GoogleApiClient mGoogleApiClient -> a
     boolean mResolvingConnectionFailure -> d
     boolean mSignInClicked -> e
