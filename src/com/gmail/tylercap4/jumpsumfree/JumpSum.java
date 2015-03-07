@@ -876,7 +876,7 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     			Bundle params = new Bundle();
     			//params.putString("caption", message);
     			params.putString("description", caption);
-    			params.putString("link", "http://play.google.com/store/apps/details?id=com.gmail.tylercap4.jumpsum");
+    			params.putString("link", "http://play.google.com/store/apps/details?id=com.gmail.tylercap4.jumpsumfree");
 
     			final WebDialog feedDialog = (
     					new WebDialog.FeedDialogBuilder(JumpSum.this,
