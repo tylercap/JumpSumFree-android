@@ -11,10 +11,13 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.FacebookDialog;
 import com.facebook.widget.WebDialog;
 import com.facebook.widget.WebDialog.OnCompleteListener;
+import com.flurry.android.FlurryAgent;
+import com.flurry.android.ads.FlurryAdBanner;
+import com.flurry.android.ads.FlurryAdBannerListener;
+import com.flurry.android.ads.FlurryAdErrorType;
+import com.flurry.android.ads.FlurryAdInterstitial;
+import com.flurry.android.ads.FlurryAdInterstitialListener;
 import com.gmail.tylercap4.jumpsumfree.basegameutils.BaseGameUtils;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -50,8 +53,14 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 	private static int RC_SIGN_IN = 9001;
 	protected static int REQUEST_LEADERBOARD = 8099;
 	
-	private InterstitialAd adMobInterstitial;
-    private AdView adMobView;
+	private static final String FLURRY_API_KEY = "ZN9SPGGB4VB3BNHGNDT8";
+    
+    private FlurryAdInterstitial mFlurryAdInterstitial = null;
+    private String intAdName = "JS_ANDROID_INTERSTITIAL";
+    
+    private RelativeLayout mBanner;
+    private FlurryAdBanner mFlurryAdBanner = null;
+    private String bannerAdName = "JS_ANDROID_BANNER";
 	
 	/* Client used to interact with Google APIs. */
 	protected GoogleApiClient mGoogleApiClient;
@@ -88,17 +97,12 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
         
         uiHelper = new UiLifecycleHelper(this, null);
         uiHelper.onCreate(savedInstanceState);
-        
-        // Create the interstitial
-        adMobInterstitial = new InterstitialAd(JumpSum.this);
-        adMobInterstitial.setAdUnitId(getString(R.string.full_page_ad_id));
 
-        // Begin loading your interstitial
-        adMobInterstitial.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
+		// configure Flurry
+        FlurryAgent.setLogEnabled(false);
 
-        // Load the banner ad
-        adMobView = (AdView) findViewById(R.id.adView);
-        adMobView.loadAd(new AdRequest.Builder().build());
+        // init Flurry
+        FlurryAgent.init(this, FLURRY_API_KEY);
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -161,11 +165,18 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
             }
         });
     }
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+		FlurryAgent.onEndSession(this);
+	}
     
     @Override
     protected void onStart(){
     	super.onStart();
-    	
+
+		FlurryAgent.onStartSession(this);
     	reloadSignIn();
     }
     
@@ -282,7 +293,9 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     public void onDestroy() {
         super.onDestroy();
         uiHelper.onDestroy();
-        adMobView.pause();
+
+        mFlurryAdBanner.destroy();
+        mFlurryAdInterstitial.destroy();
     }
 
     
@@ -290,7 +303,6 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onPause(){
     	super.onPause();
         uiHelper.onPause();
-        adMobView.pause();
 
         // Logs 'app deactivate' App Event.
         AppEventsLogger.deactivateApp(this);
@@ -333,7 +345,19 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     protected void onResume(){
     	super.onResume();
         uiHelper.onResume();
-        adMobView.resume();
+        
+		mBanner = (RelativeLayout)findViewById(R.id.banner);
+        mFlurryAdBanner = new FlurryAdBanner(this, mBanner, bannerAdName);
+ 
+        // optional allow us to get callbacks for ad events, 
+        mFlurryAdBanner.setListener(bannerAdListener);
+        
+        mFlurryAdInterstitial = new FlurryAdInterstitial(this, intAdName);
+
+        // allow us to get callbacks for ad events
+        mFlurryAdInterstitial.setListener(interstitialAdListener);
+
+        mFlurryAdBanner.fetchAndDisplayAd();
 
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
@@ -514,23 +538,15 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
     	}
     }
     
-    public void displayInterstitial() {
-    	if (adMobInterstitial.isLoaded()) {
-        	adMobInterstitial.show();
-        }
-    }
-    
     private void newGame(){
-    	displayInterstitial();
+    	this.mFlurryAdInterstitial.fetchAd();
     	
     	doNewGame();
     	this.game_over = false;
     	this.current_drag = false;
     	
     	int score = getScore();
-    	updateScore(score);
-    	
-    	adMobInterstitial.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
+    	updateScore(score);    	
     }
     
     private void gameOver( boolean new_high, int score ){    	
@@ -912,5 +928,107 @@ public abstract class JumpSum extends Activity implements ConnectionCallbacks, O
 //    		}
     	}    	
     }
+    
+    FlurryAdInterstitialListener interstitialAdListener = new FlurryAdInterstitialListener() {
+
+        @Override
+        public void onFetched(FlurryAdInterstitial adInterstitial) {
+            adInterstitial.displayAd();
+        }
+
+        @Override
+        public void onError(FlurryAdInterstitial adInterstitial, FlurryAdErrorType adErrorType, int errorCode) {
+            adInterstitial.destroy();
+        }
+        //..
+        //the remainder of listener callbacks 
+
+		@Override
+		public void onAppExit(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onClicked(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onClose(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onDisplay(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRendered(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onVideoCompleted(FlurryAdInterstitial arg0) {
+			// Auto-generated method stub
+			
+		}
+    };
+    
+    FlurryAdBannerListener bannerAdListener = new FlurryAdBannerListener() {
+        
+        @Override
+        public void onFetched(FlurryAdBanner adBanner) {
+               adBanner.displayAd();
+        }
+
+        @Override
+        public void onError(FlurryAdBanner adBanner, FlurryAdErrorType adErrorType, int errorCode) {
+             adBanner.destroy();
+        }
+       //..
+       //the remainder of the listener callback methods
+
+		@Override
+		public void onAppExit(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onClicked(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onCloseFullscreen(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRendered(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onShowFullscreen(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onVideoCompleted(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+    };
 }
 
