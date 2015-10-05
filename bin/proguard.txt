@@ -1,0 +1,62 @@
+# view AndroidManifest.xml #generated:116
+-keep class com.facebook.LoginActivity { <init>(...); }
+
+# view res/layout/com_facebook_usersettingsfragment.xml #generated:48
+-keep class com.facebook.widget.LoginButton { <init>(...); }
+
+# view AndroidManifest.xml #generated:120
+-keep class com.flurry.android.FlurryFullscreenTakeoverActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:109
+-keep class com.gmail.tylercap4.jumpsumfree.HowToPage { <init>(...); }
+
+# view AndroidManifest.xml #generated:32
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel1 { <init>(...); }
+
+# view AndroidManifest.xml #generated:95
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel10 { <init>(...); }
+
+# view AndroidManifest.xml #generated:102
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel11 { <init>(...); }
+
+# view AndroidManifest.xml #generated:39
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel2 { <init>(...); }
+
+# view AndroidManifest.xml #generated:46
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel3 { <init>(...); }
+
+# view AndroidManifest.xml #generated:53
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel4 { <init>(...); }
+
+# view AndroidManifest.xml #generated:60
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel5 { <init>(...); }
+
+# view AndroidManifest.xml #generated:67
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel6 { <init>(...); }
+
+# view AndroidManifest.xml #generated:74
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel7 { <init>(...); }
+
+# view AndroidManifest.xml #generated:81
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel8 { <init>(...); }
+
+# view AndroidManifest.xml #generated:88
+-keep class com.gmail.tylercap4.jumpsumfree.JumpSumLevel9 { <init>(...); }
+
+# view AndroidManifest.xml #generated:23
+-keep class com.gmail.tylercap4.jumpsumfree.MainMenu { <init>(...); }
+
+# view land\res/layout-land/jump_sum_7x5.xml #generated:107
+# view land\res/layout-land/jump_sum_7x6.xml #generated:120
+# view land\res/layout-land/jump_sum_7x7.xml #generated:133
+# view land\res/layout-land/jump_sum_8x6.xml #generated:126
+# view land\res/layout-land/jump_sum_8x7.xml #generated:140
+# view land\res/layout-land/main_menu.xml #generated:29
+# view res/layout/jump_sum_7x5.xml #generated:19
+# view res/layout/jump_sum_7x6.xml #generated:19
+# view res/layout/jump_sum_7x7.xml #generated:19
+# view res/layout/jump_sum_8x6.xml #generated:19
+# view res/layout/jump_sum_8x7.xml #generated:19
+# view res/layout/main_menu.xml #generated:29
+-keep class com.google.android.gms.common.SignInButton { <init>(...); }
+
