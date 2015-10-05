@@ -1,8 +1,10 @@
 package com.gmail.tylercap4.jumpsumfree;
 
+import com.flurry.android.FlurryAgent;
+import com.flurry.android.ads.FlurryAdBanner;
+import com.flurry.android.ads.FlurryAdBannerListener;
+import com.flurry.android.ads.FlurryAdErrorType;
 import com.gmail.tylercap4.jumpsumfree.basegameutils.BaseGameUtils;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -17,14 +19,19 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class MainMenu extends Activity implements ConnectionCallbacks, OnConnectionFailedListener
 {
 	private static final String SIGNED_IN_KEY = "SIGNED_IN";
 	private static int RC_SIGN_IN = 9001;
+	
+	private static final String FLURRY_API_KEY = "ZN9SPGGB4VB3BNHGNDT8";
 
-	private AdView adMobView;
+	private RelativeLayout mBanner;
+    private FlurryAdBanner mFlurryAdBanner = null;
+    private String bannerAdName = "JS_ANDROID_BANNER";
 	
 	/* Client used to interact with Google APIs. */
 	protected GoogleApiClient mGoogleApiClient;
@@ -37,9 +44,11 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);
 
-        // Load the banner ad
-        adMobView = (AdView) findViewById(R.id.adView);
-        adMobView.loadAd(new AdRequest.Builder().build());
+        // configure Flurry
+        FlurryAgent.setLogEnabled(false);
+
+        // init Flurry
+        FlurryAgent.init(this, FLURRY_API_KEY);
         
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 		        .addConnectionCallbacks(this)
@@ -171,8 +180,15 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     public void onDestroy() {
         super.onDestroy();
-        adMobView.pause();
+
+        mFlurryAdBanner.destroy();
     }
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+		FlurryAgent.onEndSession(this);
+	}
 
     private void showHowTo(){
     	// show a new page explaining how to play the game
@@ -183,7 +199,8 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     protected void onStart(){
     	super.onStart();
-    	
+
+		FlurryAgent.onStartSession(this);
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	boolean signed_in = prefs.getBoolean(SIGNED_IN_KEY, false);
     	if( signed_in ){
@@ -194,7 +211,6 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     protected void onPause(){
     	super.onPause();
-    	adMobView.pause();
     	
     	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	SharedPreferences.Editor prefs_editor = prefs.edit();
@@ -280,7 +296,13 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     @Override
     protected void onResume(){
     	super.onResume();
-    	adMobView.resume();
+    	mBanner = (RelativeLayout)findViewById(R.id.banner);
+        mFlurryAdBanner = new FlurryAdBanner(this, mBanner, bannerAdName);
+ 
+        // optional allow us to get callbacks for ad events, 
+        mFlurryAdBanner.setListener(bannerAdListener);
+
+        mFlurryAdBanner.fetchAndDisplayAd();
         
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
         	findViewById(R.id.sign_in_button).setVisibility(View.GONE);
@@ -300,4 +322,55 @@ public class MainMenu extends Activity implements ConnectionCallbacks, OnConnect
     	    findViewById(R.id.sign_out_layout).setVisibility(View.GONE);
         }
     }
+
+    FlurryAdBannerListener bannerAdListener = new FlurryAdBannerListener() {
+        
+        @Override
+        public void onFetched(FlurryAdBanner adBanner) {
+               adBanner.displayAd();
+        }
+
+        @Override
+        public void onError(FlurryAdBanner adBanner, FlurryAdErrorType adErrorType, int errorCode) {
+             adBanner.destroy();
+        }
+       //..
+       //the remainder of the listener callback methods
+
+		@Override
+		public void onAppExit(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onClicked(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onCloseFullscreen(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRendered(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onShowFullscreen(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onVideoCompleted(FlurryAdBanner arg0) {
+			// Auto-generated method stub
+			
+		}
+    };
 }
